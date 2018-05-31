@@ -219,45 +219,61 @@ def read_image_da(im_folder):
 	return batch
 """
 
-def read_k_patches(image_path, k):
-	""" It reads k random crops from an image
+def read_k_patches(image_path, k, seed = 0):
+    """ It reads k random crops from an image
 
-		Args:
-			images_path: path of the image
-			k: number of random crops to take
+        Args:
+            images_path: path of the image
+            k: number of random crops to take
 
-		Returns:
-			patches: a tensor (numpy array of images) of shape [k, 224, 224, 3]
+        Returns:
+            patches: a tensor (numpy array of images) of shape [k, 224, 224, 3]
 
-	"""
-	IMAGENET_MEAN = [123.68, 116.779, 103.939] # rgb format
+    """
+    np.random.seed(seed)
+    IMAGENET_MEAN = [123.68, 116.779, 103.939] # rgb format
 
-	img = Image.open(image_path).convert('RGB')
+    img = Image.open(image_path).convert('RGB')
 
-	# resize of the image (setting largest border to 256px)
-	if img.size[0] < img.size[1]:
-		h = int(float(256 * img.size[1]) / img.size[0])
-		img = img.resize((256, h), Image.ANTIALIAS)
-	else:
-		w = int(float(256 * img.size[0]) / img.size[1])
-		img = img.resize((w, 256), Image.ANTIALIAS)
+    # resize of the image (setting largest border to 256px)
+    if img.size[0] < img.size[1]:
+        h = int(float(256 * img.size[1]) / img.size[0])
+        img = img.resize((256, h), Image.ANTIALIAS)
+    else:
+        w = int(float(256 * img.size[0]) / img.size[1])
+        img = img.resize((w, 256), Image.ANTIALIAS)
 
-	patches = []
-	for i in range(k):
-		# random 244x224 patch
-		x = random.randint(0, img.size[0] - 224)
-		y = random.randint(0, img.size[1] - 224)
-		img_cropped = img.crop((x, y, x + 224, y + 224))
+    patches = []
+    for i in range(k):
+        # random 244x224 patch
+        x = random.randint(0, img.size[0] - 224)
+        y = random.randint(0, img.size[1] - 224)
+        img_cropped = img.crop((x, y, x + 224, y + 224))
 
-		cropped_im_array = np.array(img_cropped, dtype=np.float32)
+        cropped_im_array = np.array(img_cropped, dtype=np.float32)
 
-		for i in range(3):
-			cropped_im_array[:,:,i] -= IMAGENET_MEAN[i]
+        for i in range(3):
+            cropped_im_array[:,:,i] -= IMAGENET_MEAN[i]
 
-		patches.append(cropped_im_array)
+        patches.append(cropped_im_array)
 
-	np.vstack(patches)
-	return patches
+    np.vstack(patches)
+    return patches
+
+def read_resized_image(image_path, im_len = 224, seed = 0):
+    """ It reads k random crops from an image
+        Args:
+            images_path: path of the image
+
+        Returns:
+            img: a tensor (numpy array of images) of shape [1, 224, 224, 3]
+    """
+    IMAGENET_MEAN = [123.68, 116.779, 103.939] # rgb format
+    img = Image.open(image_path).convert('RGB')
+    # resize of the image (setting largest border to 224px)
+    img = img.resize((im_len, im_len), Image.ANTIALIAS)
+    img = np.expand_dims(img, 0)
+    return img
 
 """ reading a batch of validation images from the validation set, 
 	groundthruths label are inside an annotations file """
@@ -358,3 +374,18 @@ def imagenet_size(im_source):
 		for f in os.listdir(os.path.join(im_source, d)):
 			n += 1
 	return n
+
+
+def mkdir_if_dne(CKPT_PATH):
+    net_id = 0
+    while True: 
+        net_id_str = '%.2d' % net_id
+        if not os.path.exists(CKPT_PATH + net_id_str):
+            print('mkdir: %s' % (CKPT_PATH + net_id_str))
+            CKPT_PATH = CKPT_PATH + net_id_str
+            os.makedirs(CKPT_PATH)
+            break
+        else:
+            print('exist: %s' % (CKPT_PATH + net_id_str))
+            net_id +=1
+    return CKPT_PATH

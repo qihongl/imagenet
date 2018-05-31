@@ -77,8 +77,8 @@ if __name__ == '__main__':
 	TOP_K = 5
 	K_PATCHES = 5
 	DISPLAY_STEP = 10
-	IMAGENET_PATH = 'ILSVRC2012'
-	CKPT_PATH = 'ckpt-alexnet'
+	IMAGENET_PATH = '/scratch/gpfs/qlu/ILSVRC2012'
+	CKPT_PATH = '/tigress/qlu/logs/ILSVRC2012/ckpt-alexnet'
 
 	test( 
 		TOP_K, 

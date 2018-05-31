@@ -1,0 +1,12 @@
+*.pyc
+*.sh
+*.out
+*.log
+*.txt
+*.cmd
+
+tf/models/.ipynb_checkpoints/
+tf/.ipynb_checkpoints/
+tf/summary/*
+summary/*
+analysis/.ipynb_checkpoints

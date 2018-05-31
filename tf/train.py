@@ -153,38 +153,43 @@ def train(
 
 
 if __name__ == '__main__':
-	DROPOUT = 0.5
-	MOMENTUM = 0.9
-	LAMBDA = 5e-04 # for weight decay
-	LEARNING_RATE = 1e-03
-	EPOCHS = 90
-	BATCH_SIZE = 128
-	CKPT_PATH = 'ckpt-alexnet'
-	if not os.path.exists(CKPT_PATH):
-		os.makedirs(CKPT_PATH)
-	SUMMARY = 'summary'
-	if not os.path.exists(SUMMARY):
-		os.makedirs(SUMMARY)
+    DROPOUT = 0.5
+    MOMENTUM = 0.9
+    LAMBDA = 5e-04 # for weight decay
+    LEARNING_RATE = 1e-03
+    EPOCHS = 45
+    BATCH_SIZE = 128
 
-	IMAGENET_PATH = 'ILSVRC2012'
-	DISPLAY_STEP = 10
-	TEST_STEP = 500
-	
-	if sys.argv[1] == '-resume':
-		resume = True
-	elif sys.argv[1] == '-scratch': 
-		resume = False
+    CKPT_PATH = '/tigress/qlu/logs/ILSVRC2012/ckpt-alexnet'
+#	if not os.path.exists(CKPT_PATH):
+#		os.makedirs(CKPT_PATH)
+#    CKPT_PATH = tu.mkdir_if_dne(CKPT_PATH)
+    if sys.argv[1] == '-resume':
+        resume = True
+        CKPT_PATH += sys.argv[2]
+        print(CKPT_PATH)
+    elif sys.argv[1] == '-scratch': 
+        resume = False
 
-	train(
-		EPOCHS, 
-		BATCH_SIZE, 
-		LEARNING_RATE, 
-		DROPOUT, 
-		MOMENTUM, 
-		LAMBDA, 
-		resume, 
-		IMAGENET_PATH, 
-		DISPLAY_STEP, 
-		TEST_STEP, 
-		CKPT_PATH, 
-		SUMMARY)
+    SUMMARY = os.path.join(CKPT_PATH, 'summary')
+    if not os.path.exists(SUMMARY):
+        os.makedirs(SUMMARY)
+
+    #IMAGENET_PATH = 'ILSVRC2012'
+    IMAGENET_PATH = '/scratch/gpfs/qlu/ILSVRC2012'
+    DISPLAY_STEP = 10
+    TEST_STEP = 500
+
+    train(
+        EPOCHS, 
+        BATCH_SIZE, 
+        LEARNING_RATE, 
+        DROPOUT, 
+        MOMENTUM, 
+        LAMBDA, 
+        resume, 
+        IMAGENET_PATH, 
+        DISPLAY_STEP, 
+        TEST_STEP, 
+        CKPT_PATH, 
+        SUMMARY)
